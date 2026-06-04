@@ -62,5 +62,15 @@ def increment_click(short_code):
     conn.commit()
     conn.close()
 
+def check_duplicate_url(original_url):
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+
+    cursor.execute('SELECT short_code FROM urls WHERE original_url = ?', (original_url,))
+    result = cursor.fetchone()
+    
+    conn.close()
+    return result[0] if result else None
+
 
         

@@ -3,78 +3,199 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Python URL Shortener</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sleek URL Shortener</title>
+    <link href="https://fonts.googleapis.com/css2=family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --card-bg: rgba(255, 255, 255, 0.06);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --success: #10b981;
+        }
+
         body {
-            font-family: 'Segoe UI', sans-serif;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text-main);
+            min-height: 100vh;
             display: flex;
+            align-items: center;
             justify-content: center;
-            padding-top: 50px;
-            background: #f4f7f6;
+            margin: 0;
+            padding: 20px;
         }
 
         .container {
-            background: white;
-            padding: 2rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-            width: 400px;
+            background: var(--card-bg);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--card-border);
+            padding: 2.5rem;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
             text-align: center;
         }
 
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin: 0 0 0.5rem 0;
+            background: linear-gradient(to right, #818cf8, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-size: 0.95rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
         input[type="text"] {
-            width: 90%;
-            padding: 12px;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-            border-radius: 6px;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--card-border);
+            padding: 14px 18px;
+            border-radius: 12px;
+            color: var(--text-main);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
         }
 
         button {
-            background: #007bff;
+            background: var(--primary);
             color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 6px;
+            padding: 14px;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
             cursor: pointer;
-            font-weight: bold;
+            transition: background 0.2s ease;
         }
 
-        .result {
-            margin-top: 25px;
-            padding: 15px;
-            background: #e9f5ff;
+        button:hover {
+            background: var(--primary-hover);
+        }
+
+        .result-card {
+            margin-top: 2rem;
+            background: rgba(99, 102, 241, 0.1);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            padding: 1.25rem;
+            border-radius: 14px;
+            text-align: left;
+        }
+
+        .result-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #a5b4fc;
+            margin-bottom: 0.5rem;
+        }
+
+        .copy-box {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .short-url-link {
+            color: var(--text-main);
+            text-decoration: none;
+            font-weight: 500;
+            word-break: break-all;
+            flex-grow: 1;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 10px;
             border-radius: 8px;
-            border: 1px solid #b3d7ff;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .btn-copy {
+            background: #334155;
+            padding: 10px 14px;
+            font-size: 0.9rem;
+        }
+
+        .btn-copy:hover {
+            background: #475569;
         }
 
         .error {
-            color: #dc3545;
-            margin-top: 10px;
+            color: #f87171;
+            background: rgba(248, 113, 113, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 1rem;
+            font-size: 0.9rem;
         }
     </style>
 </head>
 
 <body>
     <div class="container">
-        <h1>URL Shortener</h1>
+        <h1>SnapURL</h1>
+        <p class="subtitle">Drop your long link below to make it punchy.</p>
 
-        <form method="POST">
-            <input type="text" name="long_url" placeholder="Paste long URL here..." required>
-            <button type="submit">Shorten URL</button>
+        <form method="POST" class="form-group">
+            <input type="text" name="long_url" placeholder="Paste your long URL here..." required>
+            <button type="submit">Shorten Link</button>
         </form>
 
         {% if short_url %}
-        <div class="result">
-            <p><strong>Success! Your short link:</strong></p>
-            <a href="{{ short_url }}" target="_blank">{{ short_url }}</a>
+        <div class="result-card">
+            <div class="result-title">Your Shortened Link</div>
+            <div class="copy-box">
+                <a href="{{ short_url }}" id="shortUrl" target="_blank" class="short-url-link">{{ short_url }}</a>
+                <button class="btn-copy" onclick="copyLink()" id="copyBtn">
+                    <i class="fa-regular fa-copy"></i> Copy
+                </button>
+            </div>
         </div>
         {% endif %}
 
         {% if error %}
-        <p class="error">{{ error }}</p>
+        <div class="error">
+            <i class="fa-solid fa-circle-exclamation"></i> {{ error }}
+        </div>
         {% endif %}
     </div>
+
+    <script>
+        function copyLink() {
+            const urlText = document.getElementById("shortUrl").innerText;
+            navigator.clipboard.writeText(urlText).then(() => {
+                const copyBtn = document.getElementById("copyBtn");
+                copyBtn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
+                copyBtn.style.backgroundColor = 'var(--success)';
+                setTimeout(() => {
+                    copyBtn.innerHTML = '<i class="fa-regular fa-copy"></i> Copy';
+                    copyBtn.style.backgroundColor = '#334155';
+                }, 2000);
+            });
+        }
+    </script>
 </body>
 
 </html>
