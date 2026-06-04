@@ -72,5 +72,16 @@ def check_duplicate_url(original_url):
     conn.close()
     return result[0] if result else None
 
+def get_all_urls():
+    conn = sqlite3.connect(DB_NAME)
+    cursor = conn.cursor()
+    
+    # B. Ask for all rows ordered by the most clicks first
+    cursor.execute('SELECT short_code, original_url, click_count FROM urls ORDER BY click_count DESC')
+    rows = cursor.fetchall()
+
+    conn.close()
+
+    return rows
 
         

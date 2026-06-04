@@ -50,6 +50,14 @@ def redirect_to_original(short_code):
     # If the short code doesn't exist in our DB, show a 404 error
     return "URL Not Found", 404
 
+@app.route("/analytics")
+def analytics():
+    # 1. Grab the list of all URLs from the database memory
+    all_links = database.get_all_urls()
+    
+    # 2. Pass that list into a new HTML page named analytics.html
+    return render_template("analytics.html", links=all_links)
+
 if __name__ == "__main__":
     app.run(debug=True)
     

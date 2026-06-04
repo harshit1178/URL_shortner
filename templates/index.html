@@ -49,6 +49,7 @@
             margin: 0 0 0.5rem 0;
             background: linear-gradient(to right, #818cf8, #c084fc);
             -webkit-background-clip: text;
+            background-clip: text;
             -webkit-text-fill-color: transparent;
         }
 
@@ -94,6 +95,28 @@
 
         button:hover {
             background: var(--primary-hover);
+        }
+
+        /* 📊 NEW STYLE ADDITION: The Analytics Link Button Layout */
+        .btn-analytics {
+            display: inline-block;
+            margin-top: 1.25rem;
+            color: #a5b4fc;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 12px;
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 12px;
+            transition: all 0.2s ease;
+            width: calc(100% - 26px);
+            /* Centers and matches input text box fields */
+        }
+
+        .btn-analytics:hover {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: var(--primary);
+            color: var(--text-main);
         }
 
         .result-card {
@@ -162,6 +185,10 @@
             <input type="text" name="long_url" placeholder="Paste your long URL here..." required>
             <button type="submit">Shorten Link</button>
         </form>
+
+        <a href="/analytics" class="btn-analytics">
+            <i class="fa-solid fa-chart-simple"></i> View Analytics Dashboard
+        </a>
 
         {% if short_url %}
         <div class="result-card">
