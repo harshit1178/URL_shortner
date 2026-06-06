@@ -4,156 +4,492 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Link Analytics Dashboard</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
+    <title>SnapURL — Analytics</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap"
+        rel="stylesheet">
     <style>
         :root {
-            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
-            --card-bg: rgba(255, 255, 255, 0.06);
-            --card-border: rgba(255, 255, 255, 0.1);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --primary: #6366f1;
-            --accent: #f59e0b;
+            --bg: #07080d;
+            --surface: #0d0f18;
+            --lift: #131627;
+            --border: #1c1f35;
+            --border-2: #262a45;
+            --text: #e8eaf2;
+            --muted: #525878;
+            --faint: #2a2e4a;
+            --accent: #b6ff57;
+            --accent-d: rgba(182, 255, 87, 0.08);
+            --accent-b: rgba(182, 255, 87, 0.18);
+            --amber: #f5a623;
+            --amber-d: rgba(245, 166, 35, 0.12);
+            --red: #ff4560;
+            --red-d: rgba(255, 69, 96, 0.10);
+            --mono: 'JetBrains Mono', monospace;
+            --sans: 'Syne', sans-serif;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-gradient);
-            color: var(--text-main);
+            font-family: var(--sans);
+            background: var(--bg);
+            color: var(--text);
             min-height: 100vh;
-            margin: 0;
-            padding: 40px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            padding: 40px 20px 60px;
+            position: relative;
         }
 
-        .dashboard-container {
-            background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            border: 1px solid var(--card-border);
-            padding: 2.5rem;
-            border-radius: 24px;
-            width: 100%;
-            max-width: 900px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        /* ── dot grid ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle, #1c1f35 1px, transparent 1px);
+            background-size: 26px 26px;
+            z-index: 0;
+            pointer-events: none;
         }
 
-        .header-box {
+        /* ── glow ── */
+        .glow {
+            position: fixed;
+            top: -100px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 350px;
+            background: radial-gradient(ellipse at center,
+                    rgba(182, 255, 87, 0.045) 0%, transparent 68%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── layout ── */
+        .page {
+            position: relative;
+            z-index: 1;
+            max-width: 920px;
+            margin: 0 auto;
+            animation: fadeUp .5s ease both;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(16px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ── top bar ── */
+        .topbar {
             display: flex;
+            align-items: flex-end;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
+            margin-bottom: 36px;
+            gap: 16px;
+            flex-wrap: wrap;
         }
 
-        h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin: 0;
-            background: linear-gradient(to right, #818cf8, #c084fc);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .topbar-left {}
+
+        .page-eyebrow {
+            font-family: var(--mono);
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .page-eyebrow::before {
+            content: '';
+            width: 20px;
+            height: 1px;
+            background: var(--accent);
+            display: inline-block;
+        }
+
+        .page-title {
+            font-size: 2.4rem;
+            font-weight: 800;
+            letter-spacing: -2px;
+            color: var(--text);
+            line-height: 1;
         }
 
         .btn-back {
-            background: #334155;
-            color: white;
-            text-decoration: none;
-            padding: 10px 16px;
-            border-radius: 10px;
-            font-size: 0.9rem;
+            font-family: var(--mono);
+            font-size: 0.8rem;
             font-weight: 500;
-            transition: background 0.2s;
+            color: var(--muted);
+            text-decoration: none;
+            background: var(--surface);
+            border: 1px solid var(--border-2);
+            padding: 9px 16px;
+            border-radius: 9px;
+            transition: color .2s, border-color .2s, background .2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
         }
 
         .btn-back:hover {
-            background: #475569;
+            color: var(--text);
+            border-color: var(--border-2);
+            background: var(--lift);
         }
 
-        /* 📊 Table Styling Rules */
+        /* ── stat cards ── */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 20px;
+            right: 20px;
+            height: 1px;
+            background: linear-gradient(90deg,
+                    transparent, var(--accent-b), transparent);
+        }
+
+        .stat-label {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+            color: var(--text);
+            line-height: 1;
+        }
+
+        .stat-value.green {
+            color: var(--accent);
+        }
+
+        .stat-value.amber {
+            color: var(--amber);
+        }
+
+        /* ── table card ── */
+        .table-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            overflow: hidden;
+        }
+
+        .table-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .table-title {
+            font-family: var(--mono);
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+        }
+
+        .table-count {
+            font-family: var(--mono);
+            font-size: 0.68rem;
+            background: var(--accent-d);
+            border: 1px solid var(--accent-b);
+            color: var(--accent);
+            padding: 2px 8px;
+            border-radius: 99px;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
-            text-align: left;
-            margin-top: 1rem;
         }
 
-        th {
-            padding: 14px;
-            color: #a5b4fc;
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            border-bottom: 2px solid var(--card-border);
-        }
-
-        td {
-            padding: 16px 14px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            font-size: 0.95rem;
-            word-break: break-all;
-        }
-
-        tr:hover {
-            background: rgba(255, 255, 255, 0.02);
-        }
-
-        .clicks-badge {
-            background: rgba(245, 158, 11, 0.15);
-            color: var(--accent);
-            padding: 4px 10px;
-            border-radius: 6px;
+        thead th {
+            padding: 13px 20px;
+            font-family: var(--mono);
+            font-size: 0.65rem;
             font-weight: 600;
-            font-size: 0.85rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.15);
         }
 
-        .empty-state {
+        tbody td {
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            font-size: 0.9rem;
+            vertical-align: middle;
+        }
+
+        tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        tbody tr {
+            transition: background .15s;
+        }
+
+        tbody tr:hover {
+            background: rgba(255, 255, 255, 0.018);
+        }
+
+        /* ── code chip ── */
+        .code-chip {
+            font-family: var(--mono);
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--accent);
+            background: var(--accent-d);
+            border: 1px solid var(--accent-b);
+            padding: 4px 10px;
+            border-radius: 7px;
+            letter-spacing: 0.04em;
+            display: inline-block;
+        }
+
+        /* ── url cell ── */
+        .url-cell {
+            font-family: var(--mono);
+            font-size: 0.8rem;
+            color: var(--muted);
+            max-width: 300px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ── clicks badge ── */
+        .clicks {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--mono);
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--amber);
+            background: var(--amber-d);
+            border: 1px solid rgba(245, 166, 35, 0.2);
+            padding: 4px 10px;
+            border-radius: 7px;
+        }
+
+        .clicks-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--amber);
+        }
+
+        /* ── delete ── */
+        .btn-del {
+            font-family: var(--mono);
+            font-size: 0.76rem;
+            font-weight: 500;
+            color: var(--red);
+            text-decoration: none;
+            background: var(--red-d);
+            border: 1px solid rgba(255, 69, 96, 0.15);
+            padding: 6px 12px;
+            border-radius: 7px;
+            transition: background .15s, border-color .15s, color .15s;
+            white-space: nowrap;
+            display: inline-block;
+        }
+
+        .btn-del:hover {
+            background: var(--red);
+            color: white;
+            border-color: var(--red);
+        }
+
+        /* ── empty state ── */
+        .empty {
             text-align: center;
-            color: var(--text-muted);
-            padding: 3rem 0;
+            padding: 64px 24px;
+        }
+
+        .empty-icon {
+            font-size: 2.8rem;
+            margin-bottom: 16px;
+            opacity: 0.3;
+        }
+
+        .empty-title {
             font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .empty-sub {
+            font-family: var(--mono);
+            font-size: 0.78rem;
+            color: var(--faint);
+        }
+
+        /* ── footer bar ── */
+        .foot-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 24px;
+            border-top: 1px solid var(--border);
+            background: rgba(0, 0, 0, 0.12);
+        }
+
+        .foot-bar-txt {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            color: var(--faint);
+            letter-spacing: 0.06em;
         }
     </style>
 </head>
 
 <body>
 
-    <div class="dashboard-container">
-        <div class="header-box">
-            <h1><i class="fa-solid fa-chart-simple"></i> Link Analytics</h1>
-            <a href="/" class="btn-back"><i class="fa-solid fa-arrow-left"></i> Shorten More</a>
+    <div class="glow"></div>
+
+    <div class="page">
+
+        <!-- top bar -->
+        <div class="topbar">
+            <div class="topbar-left">
+                <div class="page-eyebrow">SnapURL</div>
+                <h1 class="page-title">Analytics</h1>
+            </div>
+            <a href="/" class="btn-back">← Shorten More</a>
         </div>
 
+        <!-- stat cards -->
         {% if links %}
-        <table>
-            <thead>
-                <tr>
-                    <th>Short Code</th>
-                    <th>Original Destination URL</th>
-                    <th>Total Clicks</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for link in links %}
-                <tr>
-                    <td><strong style="color: #f8fafc;">{{ link[0] }}</strong></td>
-                    <td><span style="color: var(--text-muted);">{{ link[1] }}</span></td>
-                    <td><span class="clicks-badge">{{ link[2] }} clicks</span></td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-        {% else %}
-        <div class="empty-state">
-            <i class="fa-regular fa-folder-open" style="font-size: 2.5rem; margin-bottom: 1rem; display: block;"></i>
-            No links shortened yet. Go create some links first!
+        <div class="stats-row">
+            <div class="stat-card">
+                <div class="stat-label">Total Links</div>
+                <div class="stat-value green">{{ links|length }}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Total Clicks</div>
+                <div class="stat-value amber">
+                    {% set total = namespace(v=0) %}
+                    {% for l in links %}{% set total.v = total.v + l[2] %}{% endfor %}
+                    {{ total.v }}
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Top Link Clicks</div>
+                <div class="stat-value">{{ links[0][2] if links else 0 }}</div>
+            </div>
         </div>
         {% endif %}
-    </div>
 
+        <!-- table -->
+        <div class="table-card">
+
+            <div class="table-header">
+                <span class="table-title">All Links</span>
+                {% if links %}
+                <span class="table-count">{{ links|length }} records</span>
+                {% endif %}
+            </div>
+
+            {% if links %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Short Code</th>
+                        <th>Destination URL</th>
+                        <th>Clicks</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for link in links %}
+                    <tr>
+                        <td><span class="code-chip">{{ link[0] }}</span></td>
+                        <td><span class="url-cell">{{ link[1] }}</span></td>
+                        <td>
+                            <span class="clicks">
+                                <span class="clicks-dot"></span>
+                                {{ link[2] }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="/delete/{{ link[0] }}" class="btn-del"
+                                onclick="return confirm('Delete {{ link[0] }}?');">
+                                ✕ Delete
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+
+            <div class="foot-bar">
+                <span class="foot-bar-txt">sorted by clicks · descending</span>
+                <span class="foot-bar-txt">SnapURL v1.0</span>
+            </div>
+
+            {% else %}
+            <div class="empty">
+                <div class="empty-icon">◌</div>
+                <div class="empty-title">No links yet</div>
+                <div class="empty-sub">// go shorten something first</div>
+            </div>
+            {% endif %}
+
+        </div>
+
+    </div>
 </body>
 
 </html>

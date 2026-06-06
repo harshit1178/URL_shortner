@@ -8,33 +8,44 @@ app=Flask(__name__)
 database.init_db()
 
 @app.route("/", methods=["GET", "POST"])
-def home():
-    short_url=None
-    error_message=None
+@app.route("/", methods=["GET", "POST"])
 
+@app.route("/", methods=["GET", "POST"])
+def home():
+    short_url = None
+    error = None
+    
     if request.method == "POST":
         original_url = request.form.get("long_url").strip()
-        
-        # 1. Core URL Validation: Ensuring it has a domain structure (contains a '.')
+        custom_alias = request.form.get("custom_alias").strip()
         if original_url and "." in original_url:
-            
-            # 2. Auto-patching missing http/https protocol prefix
             if not original_url.startswith("http://") and not original_url.startswith("https://"):
                 original_url = "https://" + original_url
 
-            # 3. Duplicate Check: See if we have already shortened this link before
-            existing_code = database.check_duplicate_url(original_url)
-            
-            if existing_code:
-                short_url = request.host_url + existing_code
+            if custom_alias:
+                # Clean up the alias (remove spaces or slashes if any)
+                custom_alias = custom_alias.replace(" ", "-")
+                
+                # Check database memory to see if it's already taken
+                if database.is_alias_taken(custom_alias):
+                    error = f"The alias '{custom_alias}' is already taken! Please try another one."
+                else:
+                    # It's unique! Use the custom alias as our code identifier
+                    database.save_url(custom_alias, original_url, is_custom=1)
+                    short_url = request.host_url + custom_alias
             else:
-                code = utils.generate_short_code()
-                database.save_url(code, original_url)
-                short_url = request.host_url + code
+                # No custom alias provided? Proceed with standard duplicate check + random code generator
+                existing_code = database.check_duplicate_url(original_url)
+                if existing_code:
+                    short_url = request.host_url + existing_code
+                else:
+                    code = utils.generate_short_code()
+                    database.save_url(code, original_url, is_custom=0)
+                    short_url = request.host_url + code
         else:
-            error_message = "Please enter a valid URL structure (e.g., website.com)!"
-        
-    return render_template("index.html", short_url=short_url, error=error_message)
+            error = "Please enter a valid URL structure (e.g., website.com)!"
+            
+    return render_template("index.html", short_url=short_url, error=error)
 
 
 @app.route("/<short_code>")
@@ -52,11 +63,16 @@ def redirect_to_original(short_code):
 
 @app.route("/analytics")
 def analytics():
-    # 1. Grab the list of all URLs from the database memory
+    #  list of all URLs from the database memory
     all_links = database.get_all_urls()
     
-    # 2. Pass that list into a new HTML page named analytics.html
+    # 2. Pass that list 
     return render_template("analytics.html", links=all_links)
+
+@app.route("/delete/<short_code>")
+def delete_link(short_code):
+    database.delete_url(short_code)
+    return redirect("/analytics")
 
 if __name__ == "__main__":
     app.run(debug=True)

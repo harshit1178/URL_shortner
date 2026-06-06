@@ -4,225 +4,540 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sleek URL Shortener</title>
-    <link href="https://fonts.googleapis.com/css2=family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>SnapURL</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;1,400&display=swap"
+        rel="stylesheet">
     <style>
         :root {
-            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
-            --card-bg: rgba(255, 255, 255, 0.06);
-            --card-border: rgba(255, 255, 255, 0.1);
-            --text-main: #f8fafc;
-            --text-muted: #94a3b8;
-            --primary: #6366f1;
-            --primary-hover: #4f46e5;
-            --success: #10b981;
+            --bg: #07080d;
+            --surface: #0d0f18;
+            --lift: #131627;
+            --border: #1c1f35;
+            --border-2: #262a45;
+            --text: #e8eaf2;
+            --muted: #525878;
+            --faint: #2a2e4a;
+            --accent: #b6ff57;
+            --accent-d: rgba(182, 255, 87, 0.10);
+            --accent-b: rgba(182, 255, 87, 0.22);
+            --red: #ff4560;
+            --red-d: rgba(255, 69, 96, 0.10);
+            --mono: 'JetBrains Mono', monospace;
+            --sans: 'Syne', sans-serif;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: var(--bg-gradient);
-            color: var(--text-main);
+            font-family: var(--sans);
+            background: var(--bg);
+            color: var(--text);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 0;
-            padding: 20px;
+            padding: 32px 20px;
+            position: relative;
+            overflow-x: hidden;
         }
 
-        .container {
-            background: var(--card-bg);
-            backdrop-filter: blur(16px);
-            border: 1px solid var(--card-border);
-            padding: 2.5rem;
-            border-radius: 24px;
+        /* ── dot grid ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: radial-gradient(circle, #1c1f35 1px, transparent 1px);
+            background-size: 26px 26px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* ── accent glow ── */
+        .glow {
+            position: fixed;
+            top: -120px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 700px;
+            height: 420px;
+            background: radial-gradient(ellipse at center,
+                    rgba(182, 255, 87, 0.055) 0%,
+                    transparent 68%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── wrapper ── */
+        .wrap {
+            position: relative;
+            z-index: 1;
             width: 100%;
-            max-width: 480px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
-            text-align: center;
+            max-width: 500px;
+            animation: fadeUp .5s ease both;
         }
 
-        h1 {
-            font-size: 2.25rem;
-            font-weight: 700;
-            margin: 0 0 0.5rem 0;
-            background: linear-gradient(to right, #818cf8, #c084fc);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(18px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
-        p.subtitle {
-            color: var(--text-muted);
-            margin-bottom: 2rem;
-            font-size: 0.95rem;
-        }
-
-        .form-group {
+        /* ── brand ── */
+        .brand {
+            margin-bottom: 8px;
             display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-name {
+            font-size: 3.2rem;
+            font-weight: 800;
+            letter-spacing: -3px;
+            line-height: 1;
+            color: var(--text);
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 13px;
+            height: 38px;
+            background: var(--accent);
+            border-radius: 2px;
+            margin-bottom: -5px;
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .brand-pill {
+            font-family: var(--mono);
+            font-size: 0.65rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent);
+            background: var(--accent-d);
+            border: 1px solid var(--accent-b);
+            padding: 4px 9px;
+            border-radius: 99px;
+            margin-bottom: -4px;
+        }
+
+        .tagline {
+            font-family: var(--mono);
+            font-size: 0.76rem;
+            color: var(--muted);
+            margin-bottom: 32px;
+            letter-spacing: 0.02em;
+        }
+
+        .tagline em {
+            color: var(--accent);
+            font-style: normal;
+        }
+
+        /* ── card ── */
+        .card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 28px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* top accent strip */
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 28px;
+            right: 28px;
+            height: 1px;
+            background: linear-gradient(90deg,
+                    transparent, var(--accent-b), transparent);
+        }
+
+        /* ── field ── */
+        .field {
+            margin-bottom: 14px;
+        }
+
+        .lbl {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-family: var(--mono);
+            font-size: 0.67rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .lbl .req {
+            color: var(--accent);
+        }
+
+        .lbl .opt {
+            margin-left: auto;
+            font-size: 0.6rem;
+            color: var(--faint);
+            letter-spacing: 0.05em;
+            text-transform: none;
+            font-style: italic;
         }
 
         input[type="text"] {
-            background: rgba(15, 23, 42, 0.6);
-            border: 1px solid var(--card-border);
-            padding: 14px 18px;
-            border-radius: 12px;
-            color: var(--text-main);
-            font-size: 1rem;
-            transition: all 0.3s ease;
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border-2);
+            color: var(--text);
+            font-family: var(--mono);
+            font-size: 0.88rem;
+            padding: 12px 16px;
+            border-radius: 10px;
+            transition: border-color .2s, box-shadow .2s;
+        }
+
+        input[type="text"]::placeholder {
+            color: var(--faint);
         }
 
         input[type="text"]:focus {
             outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(182, 255, 87, 0.09);
         }
 
-        button {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 14px;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background 0.2s ease;
-        }
-
-        button:hover {
-            background: var(--primary-hover);
-        }
-
-        /* 📊 NEW STYLE ADDITION: The Analytics Link Button Layout */
-        .btn-analytics {
-            display: inline-block;
-            margin-top: 1.25rem;
-            color: #a5b4fc;
-            text-decoration: none;
-            font-size: 0.9rem;
-            font-weight: 500;
-            padding: 12px;
-            border: 1px solid rgba(99, 102, 241, 0.2);
-            border-radius: 12px;
-            transition: all 0.2s ease;
-            width: calc(100% - 26px);
-            /* Centers and matches input text box fields */
-        }
-
-        .btn-analytics:hover {
-            background: rgba(99, 102, 241, 0.1);
-            border-color: var(--primary);
-            color: var(--text-main);
-        }
-
-        .result-card {
-            margin-top: 2rem;
-            background: rgba(99, 102, 241, 0.1);
-            border: 1px solid rgba(99, 102, 241, 0.2);
-            padding: 1.25rem;
-            border-radius: 14px;
-            text-align: left;
-        }
-
-        .result-title {
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: #a5b4fc;
-            margin-bottom: 0.5rem;
-        }
-
-        .copy-box {
+        /* ── or divider ── */
+        .sep {
             display: flex;
-            gap: 0.5rem;
+            align-items: center;
+            gap: 10px;
+            margin: 6px 0 14px;
+        }
+
+        .sep-line {
+            flex: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .sep-txt {
+            font-family: var(--mono);
+            font-size: 0.64rem;
+            color: var(--faint);
+            letter-spacing: 0.08em;
+        }
+
+        /* ── button ── */
+        .btn-main {
+            width: 100%;
+            background: var(--accent);
+            color: #060709;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 10px;
+            font-family: var(--sans);
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            letter-spacing: 0.01em;
+            transition: opacity .15s, transform .1s;
+            margin-top: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-main:hover {
+            opacity: 0.88;
+        }
+
+        .btn-main:active {
+            transform: scale(0.99);
+        }
+
+        /* ── result ── */
+        .result {
+            margin-top: 20px;
+            background: var(--accent-d);
+            border: 1px solid var(--accent-b);
+            border-radius: 12px;
+            padding: 16px 18px;
+            animation: popIn .3s cubic-bezier(.34, 1.56, .64, 1) both;
+        }
+
+        @keyframes popIn {
+            from {
+                opacity: 0;
+                transform: scale(0.96);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .result-lbl {
+            font-family: var(--mono);
+            font-size: 0.62rem;
+            font-weight: 600;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .result-lbl::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: inline-block;
+            animation: pulse 1.4s ease infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1);
+            }
+
+            50% {
+                opacity: .4;
+                transform: scale(.7);
+            }
+        }
+
+        .result-row {
+            display: flex;
+            gap: 8px;
             align-items: center;
         }
 
-        .short-url-link {
-            color: var(--text-main);
+        .result-url {
+            font-family: var(--mono);
+            font-size: 0.85rem;
+            color: var(--text);
             text-decoration: none;
-            font-weight: 500;
-            word-break: break-all;
-            flex-grow: 1;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 10px;
+            flex: 1;
+            background: rgba(0, 0, 0, 0.35);
+            padding: 9px 12px;
             border-radius: 8px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: color .15s;
+        }
+
+        .result-url:hover {
+            color: var(--accent);
         }
 
         .btn-copy {
-            background: #334155;
-            padding: 10px 14px;
-            font-size: 0.9rem;
+            background: var(--lift);
+            color: var(--text);
+            border: 1px solid var(--border-2);
+            padding: 9px 16px;
+            border-radius: 8px;
+            font-family: var(--mono);
+            font-size: 0.78rem;
+            font-weight: 500;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: background .15s, border-color .15s, color .15s;
         }
 
         .btn-copy:hover {
-            background: #475569;
+            background: var(--border-2);
         }
 
+        .btn-copy.done {
+            background: var(--accent);
+            color: #060709;
+            font-weight: 700;
+            border-color: var(--accent);
+        }
+
+        /* ── error ── */
         .error {
-            color: #f87171;
-            background: rgba(248, 113, 113, 0.1);
-            padding: 10px;
-            border-radius: 8px;
-            margin-top: 1rem;
+            font-family: var(--mono);
+            font-size: 0.82rem;
+            color: var(--red);
+            background: var(--red-d);
+            border: 1px solid rgba(255, 69, 96, 0.18);
+            padding: 12px 16px;
+            border-radius: 10px;
+            margin-top: 16px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* ── footer link ── */
+        .foot {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 22px;
+            color: var(--muted);
+            text-decoration: none;
+            font-family: var(--mono);
+            font-size: 0.76rem;
+            transition: color .2s;
+        }
+
+        .foot:hover {
+            color: var(--accent);
+        }
+
+        .foot .arrow {
             font-size: 0.9rem;
+            color: var(--accent);
+            transition: transform .2s;
+        }
+
+        .foot:hover .arrow {
+            transform: translateX(4px);
+        }
+
+        /* ── corner decoration ── */
+        .corner {
+            position: absolute;
+            bottom: 20px;
+            right: 22px;
+            font-family: var(--mono);
+            font-size: 0.62rem;
+            color: var(--faint);
+            letter-spacing: 0.06em;
         }
     </style>
 </head>
 
 <body>
-    <div class="container">
-        <h1>SnapURL</h1>
-        <p class="subtitle">Drop your long link below to make it punchy.</p>
 
-        <form method="POST" class="form-group">
-            <input type="text" name="long_url" placeholder="Paste your long URL here..." required>
-            <button type="submit">Shorten Link</button>
-        </form>
+    <div class="glow"></div>
 
-        <a href="/analytics" class="btn-analytics">
-            <i class="fa-solid fa-chart-simple"></i> View Analytics Dashboard
+    <div class="wrap">
+
+        <div class="brand">
+            <span class="brand-name">SnapURL</span>
+            <span class="cursor"></span>
+            <span class="brand-pill">v1.0</span>
+        </div>
+
+        <p class="tagline">// paste long &rarr; get short &rarr; <em>snap.</em></p>
+
+        <div class="card">
+            <form method="POST">
+
+                <div class="field">
+                    <label class="lbl">
+                        Long URL <span class="req">*</span>
+                    </label>
+                    <input type="text" name="long_url" placeholder="https://your-very-long-link.com/goes/here" required>
+                </div>
+
+                <div class="sep">
+                    <div class="sep-line"></div>
+                    <span class="sep-txt">// optional</span>
+                    <div class="sep-line"></div>
+                </div>
+
+                <div class="field">
+                    <label class="lbl">
+                        Custom Alias
+                        <span class="opt">leave blank for random code</span>
+                    </label>
+                    <input type="text" name="custom_alias" placeholder="e.g.  my-portfolio">
+                </div>
+
+                <button type="submit" class="btn-main">
+                    ⚡ Shorten Link
+                </button>
+
+            </form>
+
+            {% if short_url %}
+            <div class="result">
+                <div class="result-lbl">link ready</div>
+                <div class="result-row">
+                    <a href="{{ short_url }}" id="shortUrl" target="_blank" class="result-url">{{ short_url }}</a>
+                    <button class="btn-copy" id="copyBtn" onclick="copyLink()">
+                        Copy
+                    </button>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if error %}
+            <div class="error">
+                <span>⚠</span> {{ error }}
+            </div>
+            {% endif %}
+
+            <div class="corner">snap → share → done</div>
+        </div>
+
+        <a href="/analytics" class="foot">
+            View Analytics Dashboard
+            <span class="arrow">→</span>
         </a>
 
-        {% if short_url %}
-        <div class="result-card">
-            <div class="result-title">Your Shortened Link</div>
-            <div class="copy-box">
-                <a href="{{ short_url }}" id="shortUrl" target="_blank" class="short-url-link">{{ short_url }}</a>
-                <button class="btn-copy" onclick="copyLink()" id="copyBtn">
-                    <i class="fa-regular fa-copy"></i> Copy
-                </button>
-            </div>
-        </div>
-        {% endif %}
-
-        {% if error %}
-        <div class="error">
-            <i class="fa-solid fa-circle-exclamation"></i> {{ error }}
-        </div>
-        {% endif %}
     </div>
 
     <script>
         function copyLink() {
-            const urlText = document.getElementById("shortUrl").innerText;
-            navigator.clipboard.writeText(urlText).then(() => {
-                const copyBtn = document.getElementById("copyBtn");
-                copyBtn.innerHTML = '<i class="fa-solid fa-check"></i> Copied!';
-                copyBtn.style.backgroundColor = 'var(--success)';
+            const url = document.getElementById('shortUrl').innerText;
+            navigator.clipboard.writeText(url).then(() => {
+                const btn = document.getElementById('copyBtn');
+                btn.textContent = '✓ Copied!';
+                btn.classList.add('done');
                 setTimeout(() => {
-                    copyBtn.innerHTML = '<i class="fa-regular fa-copy"></i> Copy';
-                    copyBtn.style.backgroundColor = '#334155';
+                    btn.textContent = 'Copy';
+                    btn.classList.remove('done');
                 }, 2000);
             });
         }
     </script>
+
 </body>
 
 </html>
