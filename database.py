@@ -74,7 +74,7 @@ def check_duplicate_url(original_url):
     conn.close()
     return result[0] if result else None
 
-# 🌟 UPDATED: Added the bulletproof filter to completely hide personal custom aliases
+
 def get_all_urls():
     conn = sqlite3.connect(DB_NAME)
     cursor = conn.cursor()

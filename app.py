@@ -1,6 +1,9 @@
 from flask import Flask, render_template, request, redirect, url_for   
 import database
 import utils
+import qrcode
+import io
+import base64
 
 app=Flask(__name__)
 
@@ -11,9 +14,12 @@ database.init_db()
 @app.route("/", methods=["GET", "POST"])
 
 @app.route("/", methods=["GET", "POST"])
+
+@app.route("/", methods=["GET", "POST"])
 def home():
     short_url = None
     error = None
+    qr_base64 = None  # Holds our dynamic image data string
     
     if request.method == "POST":
         original_url = request.form.get("long_url").strip()
@@ -42,11 +48,28 @@ def home():
                     code = utils.generate_short_code()
                     database.save_url(code, original_url, is_custom=0)
                     short_url = request.host_url + code
+
+            # 📱 DYNAMIC ENGINE: If a short URL was successfully created, generate its QR code
+            if short_url:
+                # 1. Create the QR Code object
+                qr = qrcode.QRCode(version=1, box_size=10, border=2)
+                qr.add_data(short_url)
+                qr.make(fit=True)
+                
+                # 2. Compile it as an image in RAM memory using Pil
+                img = qr.make_image(fill_color="black", back_color="transparent")
+                
+                # 3. Stream the image bytes into a virtual memory buffer
+                buffer = io.BytesIO()
+                img.save(buffer, format="PNG")
+                
+                # 4. Convert those raw bytes into a Base64 text string for HTML rendering
+                qr_base64 = base64.b64encode(buffer.getvalue()).decode()
+                
         else:
             error = "Please enter a valid URL structure (e.g., website.com)!"
             
-    return render_template("index.html", short_url=short_url, error=error)
-
+    return render_template("index.html", short_url=short_url, error=error, qr_base64=qr_base64)
 
 @app.route("/<short_code>")
 def redirect_to_original(short_code):
@@ -75,5 +98,5 @@ def delete_link(short_code):
     return redirect("/analytics")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(host="0.0.0.0", port=5000, debug=True)
     

@@ -504,6 +504,16 @@
                         Copy
                     </button>
                 </div>
+
+                {% if qr_base64 %}
+                <div
+                    style="text-align: center; margin-top: 18px; padding-top: 14px; border-top: 1px dashed var(--border-2);">
+                    <div class="result-lbl" style="justify-content: center; margin-bottom: 12px;">qr code ready</div>
+                    <img src="data:image/png;base64,{{ qr_base64 }}" alt="Link QR Code"
+                        style="width: 140px; height: 140px; background: #ffffff; padding: 6px; border-radius: 8px; box-shadow: 0 0 15px rgba(182, 255, 87, 0.15);">
+                </div>
+                {% endif %}
+
             </div>
             {% endif %}
 
