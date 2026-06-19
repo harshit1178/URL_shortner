@@ -28,7 +28,7 @@ A clean, fast URL shortener built with Flask and SQLite — shorten long links, 
 ![Result with QR Code](screenshots/result.png)
 
 **Analytics Dashboard**
-![Analytics Dashboard](screenshots/analytics.png)
+![Analytics Dashboard](screenshots/analytics2.png)
 
 ---
 
